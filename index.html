@@ -353,6 +353,9 @@
         alert('削除失敗: ' + err.message);
       }
     }
+if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
   </script>
 </body>
 </html>
