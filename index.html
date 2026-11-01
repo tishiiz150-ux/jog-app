@@ -518,3 +518,57 @@
       if (!target) return;
       document.getElementById('editRow').value = row;
       document.getElementById('date').value = target.date;
+      document.getElementById('distance').value = target.distance;
+      document.getElementById('location').value = target.location;
+      document.getElementById('formTitle').innerText = '✏️ 記録の修正';
+      document.getElementById('btn').innerText = '修正を保存する';
+      document.getElementById('cancelBtn').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('cancelBtn').addEventListener('click', resetForm);
+
+    function resetForm() {
+      document.getElementById('editRow').value = '';
+      document.getElementById('distance').value = '';
+      document.getElementById('location').value = '';
+      setTodayDate();
+      document.getElementById('formTitle').innerText = '🏃‍♂️ ジョグ記録入力';
+      document.getElementById('btn').innerText = '登録する';
+      document.getElementById('cancelBtn').style.display = 'none';
+    }
+
+    async function deleteRecord(row) {
+      if (!confirm('この記録を削除しますか？')) return;
+      const msg = document.getElementById('msg');
+      msg.style.color = '#555';
+      msg.innerText = '削除中...';
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'delete', row: row })
+        });
+        const result = await res.json();
+        if (result.status === 'success') {
+          msg.style.color = '#1e7e34';
+          msg.innerText = '削除しました。';
+          loadData();
+        } else {
+          throw new Error(result.message);
+        }
+      } catch (err) {
+        alert('削除失敗: ' + err.message);
+      }
+    }
+
+    // 即座に初期化
+    initUI();
+    // 非同期で最新データ読み込み
+    loadData();
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
+  </script>
+</body>
+</html>
